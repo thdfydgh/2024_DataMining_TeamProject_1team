@@ -22,8 +22,7 @@ trial_modeling : 시도중인 연습 코드
 시도중인 것 : 중상자수, 경상자수, 부상신고자수를 한 번에 예측해보자
 
 --> 현재 시도중인 것.
-사망자수 classfier, 중상자수 classfier, 경상자수+부상신고자수 regression
--> feature selection.
+사망자분류모델 -> feature selection -> 차대 사람 유의미(사망자 분류에 큰 요인이더라) -> ECLO예측(동별 상해정도 차이가 있더라)  -> 동별 예측 -> merge -> 동별 대책 수립(결론)
 </pre>
 
 교통사고 피해예측 EDA.ipynb : 각 feature별 ECLO값 EDA
