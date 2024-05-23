@@ -7,7 +7,6 @@ data_prepro: 데이터 전처리 파일 모음
 predict_model : 모델링 파일 모음
   </pre>
 ## 파일 설명
----
 ### data_prepro 폴더
 <pre>
 
@@ -26,4 +25,6 @@ trial_modeling : 시도중인 연습 코드
 사망자수 classfier, 중상자수 classfier, 경상자수+부상신고자수 regression
 -> feature selection.
 </pre>
+
+교통사고 피해예측 EDA.ipynb : 각 feature별 ECLO값 EDA
 ---
