@@ -8,8 +8,9 @@ predict_model : 모델링 파일 모음
   </pre>
 ## 파일 설명
 ---
-<pre>
 ### data_prepro 폴더
+<pre>
+
 death_classifier.py : 사망자수 예측(Binary classfier)을 위한 전처리 코드
 total_data_prepro.py : ECLO 예측을 위한 전처리 코드
 two_model : 사망자수와 중상자수,경상자수,부상신고자수 따로 예측하기 위한 통합 전처리 코드
