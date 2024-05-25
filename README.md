@@ -16,6 +16,7 @@ predict_model : 모델링 파일 모음
 death_classifier.py : 사망자수 예측(Binary classfier)을 위한 전처리 코드
 total_data_prepro.py : ECLO 예측을 위한 전처리 코드
 two_model : 사망자수와 중상자수,경상자수,부상신고자수 따로 예측하기 위한 통합 전처리 코드
+행정동 통합 및 데이터합산.csv : 데이터 별 행정동명 통일 및 변환 후 동일한 이름의 행정동 행들을 합산한 데이터
 </pre>
 ### predict_model 폴더
 <pre>
