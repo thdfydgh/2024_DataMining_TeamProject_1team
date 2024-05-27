@@ -790,12 +790,193 @@ df_grouped_2 = df_hjd_total.groupby('dong_name').agg({
 - senior_rate : 노인인구비율(합산 후 노인인구수/총인구수로 계산하여 추가)
 - raw data에서 ‘행정동’ 컬럼 값을 참조해 그 옆에 해당하는 행정동의 senior, total_population, street parking, senior_ratio 값을 추가함
 ---
+### 동별 예측 모델
 
 
 
+#### "평균 ECLO" 예측을 위한 RandomForestRegressor 및 Feature Selection
+
+ `RandomForestRegressor` 모델을 사용하여 "평균 ECLO"를 예측하고, feature importances를 기반으로 중요한 특징을 선택하여 모델 성능을 향상시키는 것을 목표로 한다.
 
 
+#### 1. 데이터 로드 및 준비
 
+데이터를 로드하고, "행정동" 열을 제거하여 전처리한다. (행정동 컬럼은 공공데이터 merge 용이기 때문)
+
+```python
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import r2_score
+import matplotlib.pyplot as plt
+import matplotlib.font_manager as fm
+data1 = pd.read_csv(r"C:\Users\thdfy\OneDrive\바탕 화면\Datamining_Teampro\dong_predict\data\2022_final_차대사람.csv", encoding = 'euc-kr')
+data2 = pd.read_csv(r"C:\Users\thdfy\OneDrive\바탕 화면\Datamining_Teampro\dong_predict\data\2022_final_차대차.csv", encoding = 'euc-kr')
+# 데이터 전처리: "행정동" 열 제거
+data1.drop(columns='행정동', inplace=True)
+data2.drop(columns='행정동', inplace=True)
+```
+
+#### 2. 한국어 폰트 설정
+
+시각화를 위해 한국어 폰트를 설정한다.
+
+```python
+# 한국어 폰트 설정
+font_path = "c:/Windows/Fonts/malgun.ttf"  # Windows의 경우
+fontprop = fm.FontProperties(fname=font_path, size=12)
+plt.rc('font', family=fontprop.get_name())
+```
+
+#### 3. 데이터 준비 함수
+
+데이터를 학습용과 테스트용으로 분리한다.
+
+```python
+# 모델을 위한 데이터 준비 함수
+def prepare_data(df, target_column):
+    X = df.drop(columns=[target_column])
+    y = df[target_column]
+    return train_test_split(X, y, test_size=0.2, random_state=42)
+```
+
+#### 4. 모델 학습 및 평가 함수
+
+`RandomForestRegressor` 모델을 학습시키고, 예측 성능을 평가한다. 또한, feature importances를 반환한다.
+
+```python
+# 모델 학습 및 평가 함수
+def train_and_evaluate_model(X_train, X_test, y_train, y_test):
+    model = RandomForestRegressor(random_state=42)
+    model.fit(X_train, y_train)
+    y_pred = model.predict(X_test)
+    r2 = r2_score(y_test, y_pred)
+    feature_importances = model.feature_importances_
+    return r2, feature_importances, X_train.columns
+```
+
+#### 5. 중요한 특징 선택 함수
+
+초기 모델에서 얻은 feature importances를 기준으로 중요한 특징만을 선택한다.
+
+```python
+# 중요한 특징 선택 함수
+def select_important_features(X_train, X_test, importances, threshold=0.02):
+    important_features = [feature for feature, importance in zip(X_train.columns, importances) if importance > threshold]
+    return X_train[important_features], X_test[important_features]
+```
+
+#### 6. 초기 모델 학습 및 feature importances 얻기
+
+초기 모델을 학습시키고 feature importances를 얻는다.
+
+```python
+# 초기 모델 학습 및 feature importances 얻기
+X_train_data1, X_test_data1, y_train_data1, y_test_data1 = prepare_data(data1, '평균 ECLO')
+r2_data1, feature_importances_data1, feature_names_data1 = train_and_evaluate_model(X_train_data1, X_test_data1, y_train_data1, y_test_data1)
+
+X_train_data2, X_test_data2, y_train_data2, y_test_data2 = prepare_data(data2, '평균 ECLO')
+r2_data2, feature_importances_data2, feature_names_data2 = train_and_evaluate_model(X_train_data2, X_test_data2, y_train_data2, y_test_data2)
+```
+
+#### 7. 초기 R-squared 값 출력
+
+초기 모델의 R-squared 값을 출력한다.
+
+```python
+# 초기 R-squared 값 출력
+print(f'Initial R2 Score for 차대사람 dataset: {r2_data1}')
+print(f'Initial R2 Score for 차대차 dataset: {r2_data2}')
+```
+
+#### 8. 중요한 특징 선택
+
+초기 feature importances를 기반으로 중요한 특징을 선택한다.
+
+```python
+# 초기 feature importances를 기반으로 중요한 특징 선택
+X_train_data1_selected, X_test_data1_selected = select_important_features(X_train_data1, X_test_data1, feature_importances_data1)
+X_train_data2_selected, X_test_data2_selected = select_important_features(X_train_data2, X_test_data2, feature_importances_data2)
+```
+
+#### 9. 선택된 특징으로 모델 재학습 및 평가
+
+선택된 특징을 사용하여 모델을 재학습하고 성능을 평가한다.
+
+```python
+# 선택된 특징으로 모델 재학습 및 평가
+r2_data1_selected, feature_importances_data1_selected, _ = train_and_evaluate_model(X_train_data1_selected, X_test_data1_selected, y_train_data1, y_test_data1)
+r2_data2_selected, feature_importances_data2_selected, _ = train_and_evaluate_model(X_train_data2_selected, X_test_data2_selected, y_train_data2, y_test_data2)
+```
+
+#### 10. feature selection 후 R-squared 값 출력
+
+feature selection 후 R-squared 값을 출력한다.
+
+```python
+# feature selection 후 R-squared 값 출력
+print(f'R2 Score for 차대사람 dataset after feature selection: {r2_data1_selected}')
+print(f'R2 Score for 차대차 dataset after feature selection: {r2_data2_selected}')
+```
+
+#### 11. 중요 특징들 데이터프레임으로 정리
+
+중요 특징들을 데이터프레임으로 정리한다.
+
+```python
+# 중요 특징들 데이터프레임으로 정리
+feature_importances_df1 = pd.DataFrame({'Feature': X_train_data1_selected.columns, 'Importance': feature_importances_data1_selected}).sort_values(by='Importance', ascending=False)
+feature_importances_df2 = pd.DataFrame({'Feature': X_train_data2_selected.columns, 'Importance': feature_importances_data2_selected}).sort_values(by='Importance', ascending=False)
+```
+
+#### 12. 중요 특징 시각화 함수
+
+중요 특징을 시각화하는 함수를 정의하고, 이를 사용하여 그래프를 그린다.
+
+```python
+# 중요 특징 시각화 함수
+def plot_feature_importances(feature_importances_df, title):
+    plt.figure(figsize=(10, 6))
+    plt.barh(feature_importances_df['Feature'][:10], feature_importances_df['Importance'][:10])
+    plt.xlabel('Importance')
+    plt.ylabel('Feature')
+    plt.title(title)
+    plt.gca().invert_yaxis()
+    plt.show()
+
+# 중요 특징 시각화
+plot_feature_importances(feature_importances_df1, 'Top 10 Feature Importances for 차대사람 Dataset')
+plot_feature_importances(feature_importances_df2, 'Top 10 Feature Importances for 차대차 Dataset')
+```
+
+#### 13. 상위 10개 중요한 특징 출력
+
+각 데이터셋에서 상위 10개의 중요한 특징을 출력한다.
+
+```python
+# 상위 10개 중요한 특징 출력
+print('Top 10 Feature Importances for 차대사람 Dataset:')
+print(feature_importances_df1.head(10))
+print('Top 10 Feature Importances for 차대차 Dataset:')
+print(feature_importances_df2.head(10))
+```
+
+### 결과 분석
+
+- 초기 모델의 R-squared 값:
+  - 차대사람 데이터셋: 0.425
+  - 차대차 데이터셋: 0.261
+
+- feature selection 후 모델의 R-squared 값:
+  - 차대사람 데이터셋: 0.427
+  - 차대차 데이터셋: 0.243
+
+feature selection을 통해 차대사람 데이터셋의 성능이 소폭 향상되었다.
+```
+
+
+![image](https://github.com/thdfydgh/2024_DataMining_TeamProject_1team/assets/126649413/0b7f0920-a1c4-4fd7-ba47-3106d2e92eaf)
+![image](https://github.com/thdfydgh/2024_DataMining_TeamProject_1team/assets/126649413/b8fe8a0d-d89e-4079-a86e-4d2d36491db0)
 
 
 
