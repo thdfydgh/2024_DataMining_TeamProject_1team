@@ -1,8 +1,17 @@
 # 서울시 교통사고 상해예측 & 위험요인 분석
 ---
+## 활용 Data : TAAS(Traffic Accident Analysis System) 교통사고 분석 시스템 Data
+https://taas.koroad.or.kr/web/shp/sbm/initGisAnals.do?menuId=WEB_KMP_GIS_TAS 
+교통사고분석시스템에서 제공하는 서울시 지역별 Dataset을 구축하였다.
+![image](https://github.com/thdfydgh/2024_DataMining_TeamProject_1team/assets/126649413/6e613ca4-6ed4-467d-9441-91bf0873628d)
+Data의 형태는 다음과 같다.
+![image](https://github.com/thdfydgh/2024_DataMining_TeamProject_1team/assets/126649413/588dc067-23f7-42d1-a9ff-9a84cd77541b)
+우리는 이 Dataset을 기반으로, Equivalent Casualty Loss Only(ECLO) 즉, 교통사고 상해정도를 예측하고 위험 요인 분석을 한다.
+ECLO = 사망자수 * 10 + 중상자수 * 5 + 경상자수 * 3 + 부상자수 * 1
 <pre>
-사망자분류모델 -> feature selection -> 차대 사람 유의미(사망자 분류에 큰 요인이더라) -> ECLO예측(동별 상해정도 차이가 있더라)  -> 동별 예측 -> merge -> 동별 대책 수립(결론)
+사망자분류모델 -> feature selection -> 차대 사람 유의미 -> ECLO예측 --> 동별 상해정도 차이 유의미  -> 동별 예측 -> merge -> 동별 대책 수립(결론)
 </pre>
+
 ## 폴더 설명
 <pre>
 data : 2022년도, 2023년도 상해 DataSet (TAAS)
@@ -22,17 +31,45 @@ two_model : 사망자수와 중상자수,경상자수,부상신고자수 따로 
 <pre>
 deathnum_classfier.ipynb : 사망자수 예측 
 modeling : ECLO 예측
-trial_modeling : 시도중인 연습 코드
-시도중인 것 : 중상자수, 경상자수, 부상신고자수를 한 번에 예측해보자
-
---> 현재 시도중인 것.
-사망자분류모델 -> feature selection -> 차대 사람 유의미(사망자 분류에 큰 요인이더라) -> ECLO예측(동별 상해정도 차이가 있더라)  -> 동별 예측 -> merge -> 동별 대책 수립(결론)
 </pre>
 
 교통사고 피해예측 EDA.ipynb : 각 feature별 ECLO값 EDA
 ---
 
-## 데이터 전처리
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## 공공데이터 전처리 (행정동, 법정동 단위 맞추기)
 ---
 ### 배경
 
@@ -182,3 +219,37 @@ df_grouped_2 = df_hjd_total.groupby('dong_name').agg({
 - senior_rate : 노인인구비율(합산 후 노인인구수/총인구수로 계산하여 추가)
 - raw data에서 ‘행정동’ 컬럼 값을 참조해 그 옆에 해당하는 행정동의 senior, total_population, street parking, senior_ratio 값을 추가함
 ---
+
+## Modeling 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
