@@ -20,8 +20,14 @@ two_model : 사망자수와 중상자수,경상자수,부상신고자수 따로 
 deathnum_classfier.ipynb : 사망자수 예측 
 modeling : ECLO 예측
 </pre>
-
+### Main
+<pre>
 교통사고 피해예측 EDA.ipynb : 각 feature별 ECLO값 EDA
+deathnum_classfier.ipynb
+modeling.ipynb
+predict.ipynb
+</pre>
+
 ## 활용 Data : TAAS(Traffic Accident Analysis System) 교통사고 분석 시스템 Data
 https://taas.koroad.or.kr/web/shp/sbm/initGisAnals.do?menuId=WEB_KMP_GIS_TAS 
 
