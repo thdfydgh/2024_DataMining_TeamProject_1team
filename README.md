@@ -972,13 +972,11 @@ print(feature_importances_df2.head(10))
   - 차대차 데이터셋: 0.243
 
 feature selection을 통해 차대사람 데이터셋의 성능이 소폭 향상되었다.
-```
 
 
-![차대사람](https://github.com/thdfydgh/2024_DataMining_TeamProject_1team/assets/126649413/8673d4d9-2fb2-4d8c-8fa3-30080f94bbd9)
-![차대차](https://github.com/thdfydgh/2024_DataMining_TeamProject_1team/assets/126649413/427a699e-f48c-4885-b696-ec5aacc9be10)
+![image](https://github.com/thdfydgh/2024_DataMining_TeamProject_1team/assets/126649413/ed39cb12-f9a9-495c-8934-7087f6088098)
 
-
+![image](https://github.com/thdfydgh/2024_DataMining_TeamProject_1team/assets/126649413/4a685c81-5301-4ab6-9dde-220eebc4adc4)
 
 
 
