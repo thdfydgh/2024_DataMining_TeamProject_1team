@@ -50,8 +50,6 @@ Name: count, dtype: int64
 서울 내 2022년도의 33699건 사고 중 사망사고의 비율은 0.5503745604647607% 이다.
 </pre>
 
-### 데이터 전처리
-
 #### 데이터 전처리 과정
 
 1. **사망사고 라벨링**:
@@ -272,11 +270,10 @@ ECLO 값이 8.00 이상인 경우 주말에 발생하는 비율이 높고, 8.00 
 ![image](https://github.com/thdfydgh/2024_DataMining_TeamProject_1team/assets/126649413/5b83d25f-7ed9-471f-818f-0799b50b3d39)
 
 사고 발생 시간대와 ECLO 간의 관계를 분석하였다.
+ECLO가 높은 사고의 다른 시간대와의 비율은 밤 사이가 낮은 사고보다 높은걸 확인 할 수 있었다.
 
 EDA에서 얻은 인사이트를 기반으로 feature engineering를 진행하였다.
 
-
-다음은 데이터 전처리 과정의 설명과 코드를 순서대로 작성한 `README.md` 파일이다:
 
 ---
 
@@ -464,20 +461,185 @@ EDA에서 얻은 인사이트를 기반으로 feature engineering를 진행하�
     ```
 
 
+---
+
+### CatBoost 선정 이유
+
+CatBoost는 범주형 변수를 효과적으로 처리할 수 있는 능력과 강력한 트리 기반 모델링 기능을 제공하기 때문에 선택되었다. CatBoost의 주요 장점은 다음과 같다:
+
+1. **트리 분개(Tree Splitting)의 장점**:
+    - 트리 분개는 복잡한 데이터 패턴을 효과적으로 캡처하고 비선형 관계를 잘 모델링할 수 있다.
+    - 여러 변수 간의 상호작용을 자동으로 고려하며, 데이터의 스케일에 민감하지 않다.
+
+2. **Ordered Target Statistics (TS)의 카테고리 처리 장점**:
+    - CatBoost는 카테고리 데이터를 처리할 때, 표준적인 one-hot 인코딩 대신 순서가 있는 대상 통계(Ordered TS)를 사용하여 과적합을 방지하고 학습 속도를 향상시킨다.
+    - 이 방법은 데이터 누출을 방지하고, 범주형 변수의 고유값이 많아도 효과적으로 학습할 수 있게 한다.
+
+#### 데이터셋 준비
+
+#### 결측값 처리
+```python
+# 결측값 처리 (결측값이 있는 경우)
+train = train.fillna(0)
+test = test.fillna(0)
+```
+결측값을 0으로 채운다.
+
+#### 사고 유형별 데이터셋 분할 및 샘플링
+```python
+# 사고 유형별로 데이터셋 분할 및 샘플링
+train1 = train[train["사고유형"] == "차량단독"]  # 차량단독
+train2 = train[train["사고유형"] == "차대차"]  # 차대차
+train3 = train[train["사고유형"] == "차대사람"]  # 차대사람
+
+test1 = test[test["사고유형"] == "차량단독"]
+test2 = test[test["사고유형"] == "차대차"]
+test3 = test[test["사고유형"] == "차대사람"]
+```
+사고 유형에 따라 데이터를 세 개의 그룹으로 분리한다: 차량단독, 차대차, 차대사람.
+
+#### 데이터셋 분할 함수 정의
+```python
+# 데이터셋 분할 함수 정의
+def split_data(df, target):
+    X = df.drop(columns=[target])
+    y = df[target]
+    return X, y
+
+X_train1, y_train1 = split_data(train1, 'ECLO')
+X_train2, y_train2 = split_data(train2, 'ECLO')
+X_train3, y_train3 = split_data(train3, 'ECLO')
+
+X_test1, y_test1 = split_data(test1, 'ECLO')
+X_test2, y_test2 = split_data(test2, 'ECLO')
+X_test3, y_test3 = split_data(test3, 'ECLO')
+```
+데이터셋을 특징(X)과 목표 변수(y)로 분리하는 함수를 정의하고 이를 통해 학습 및 테스트 데이터를 분할한다.
+
+#### CatBoost 모델 학습 및 평가
+
+#### RMSLE 계산 함수 정의
+```python
+# RMSLE 계산 함수 정의
+def rmsle(y_true, y_pred):
+    return np.sqrt(mean_squared_log_error(y_true, y_pred))
+```
+모델의 예측 성능을 평가하기 위해 RMSLE (Root Mean Squared Log Error)를 계산하는 함수를 정의한다.
+
+#### CatBoost 모델 학습 및 평가 함수 정의
+```python
+# CatBoost 모델 학습 및 평가 함수 정의
+def train_and_evaluate(X_train, y_train, X_test, y_test, params, cat_features):
+    model = CatBoostRegressor(random_seed=42, thread_count=-1, **params)
+    model.fit(X_train, y_train, cat_features=cat_features, verbose=0)
+    y_pred_test = model.predict(X_test)
+
+    rmsle_value = rmsle(y_test, y_pred_test)
+    r2_value = r2_score(y_test, y_pred_test)
+
+    return model, rmsle_value, r2_value
+```
+CatBoost 모델을 학습하고 평가하는 함수를 정의한다. 모델은 주어진 파라미터와 범주형 특징을 사용하여 학습된다.
+
+#### 범주형 피처 인덱스 추출
+```python
+# 범주형 피처 인덱스 추출
+cat_features1 = np.where(X_train1.dtypes == object)[0]
+cat_features2 = np.where(X_train2.dtypes == object)[0]
+cat_features3 = np.where(X_train3.dtypes == object)[0]
+```
+범주형 특징의 인덱스를 추출하여 CatBoost 모델에 제공한다.
+
+#### CatBoost 파라미터 설정
+
+```python
+# CatBoost 파라미터 설정
+catboost_params1 = {
+    'iterations': 6111,
+    'od_wait': 609,
+    'learning_rate': 0.04119744178592561,
+    'reg_lambda': 5.488592836608496,
+    'subsample': 0.9203846250162546,
+    'random_strength': 14.883401811234684,
+    'depth': 5,
+    'min_data_in_leaf': 3,
+    'leaf_estimation_iterations': 10,
+    'bagging_temperature': 0.01789129283627206,
+    'colsample_bylevel': 0.5972283837388589
+}
+
+catboost_params2 = {
+    'iterations': 13411,
+    'od_wait': 1144,
+    'learning_rate': 0.021727882868213363,
+    'reg_lambda': 21.015616790374914,
+    'subsample': 0.878372685297051,
+    'random_strength': 36.58060974949341,
+    'depth': 7,
+    'min_data_in_leaf': 7,
+    'leaf_estimation_iterations': 9,
+    'bagging_temperature': 0.05180927511974106,
+    'colsample_bylevel': 0.579406682782964
+}
+
+catboost_params3 = {
+    'iterations': 6500,
+    'od_wait': 1641,
+    'learning_rate': 0.039883471636645535,
+    'reg_lambda': 8.723928583044282,
+    'subsample': 0.8317293182421713,
+    'random_strength': 22.481544108255296,
+    'depth': 5,
+    'min_data_in_leaf': 9,
+    'leaf_estimation_iterations': 9,
+    'bagging_temperature': 0.022614197973049137,
+    'colsample_bylevel': 0.7882803255907027
+}
+```
+각 사고 유형별로 CatBoost 모델의 하이퍼파라미터를 설정한다.
+
+#### 모델 학습 및 평가
+```python
+# 모델 학습 및 평가
+model1, rmsle1, r21 = train_and_evaluate(X_train1, y_train1, X_test1, y_test1, catboost_params1, cat_features1)
+model2, rmsle2, r22 = train_and_evaluate(X_train2, y_train2, X_test2, y_test2, catboost_params2, cat_features2)
+model3, rmsle3, r23 = train_and_evaluate(X_train3, y_train3, X_test3, y_test3, catboost_params3, cat_features3)
+
+print(f'차량단독 사고 유형 - RMSLE: {rmsle1}, R²: {r21}')
+print(f'차대차 사고 유형 - RMSLE: {rmsle2}, R²: {r22}')
+print(f'차대사람 사고 유형 - RMSLE: {rmsle3}, R²: {r23}')
+```
+각 사고 유형별로 CatBoost 모델을 학습하고 평가한다. RMSLE와 R² 값을 출력한다.
+
+## 예측 및 시각화
+
+### 예측값을 테스트 데이터프레임에 추가
+```python
+# 예측값을 test 데이터프레임에 추가
+test1['predict'] = model1.predict(X_test1)
+test2['predict'] = model2.predict(X_test2)
+test3['predict'] = model3.predict(X_test3)
+```
+각 모델의 예측값을 테스트 데이터프레임에 추가한다.
 
 
 
+![image](https://github.com/thdfydgh/2024_DataMining_TeamProject_1team/assets/126649413/7eec64e8-b8a4-4ecc-8b94-bc4dc9a7a25d)
+
+![image](https://github.com/thdfydgh/2024_DataMining_TeamProject_1team/assets/126649413/986696a1-5d73-4b96-9c88-b012ced61228)
+
+![image](https://github.com/thdfydgh/2024_DataMining_TeamProject_1team/assets/126649413/b1a7b379-91e0-4de1-a156-b0c2578ed765)
 
 
+#### Feature Importance 분석
+각 예측에서 얻을 수 있는 주요 위험 요인은 다음과 같다.
+동, 구 : 서울시 내 지역별 공간적 특징이 교통사고 상해정도에 영향을 끼친다.
+-> 동 별로 위험요인 분석을 추가적으로 진행해 구체적인 방안을 도출할 예정이다.
+이 feature importance를 기반으로, 동 별 위험요인 분석에 사용할 feature selection을 진행한다.
 
+[도로형태, 가해운전자 차종, 가해운전자 평균 연령 ]
 
-
-
-
-
-
-
-
+동 별 예측을 하기 위해 추가적인 공공데이터를 수집했다.
 
 
 ## 공공데이터 전처리 (행정동, 법정동 단위 맞추기)
@@ -630,10 +792,6 @@ df_grouped_2 = df_hjd_total.groupby('dong_name').agg({
 - senior_rate : 노인인구비율(합산 후 노인인구수/총인구수로 계산하여 추가)
 - raw data에서 ‘행정동’ 컬럼 값을 참조해 그 옆에 해당하는 행정동의 senior, total_population, street parking, senior_ratio 값을 추가함
 ---
-
-## Modeling 
-
-
 
 
 
