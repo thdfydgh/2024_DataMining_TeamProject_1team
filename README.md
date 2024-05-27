@@ -45,7 +45,7 @@ Data의 형태는 다음과 같다.
 
 ---
 ## 모델링
-### 1. 사망사고 예측 모델
+### 1. 사망사고 여부 이진 분류 예측 모델
 <pre>
 사고내용
 경상사고      23723
@@ -241,7 +241,7 @@ Name: count, dtype: int64
 ![image](https://github.com/thdfydgh/2024_DataMining_TeamProject_1team/assets/126649413/b8569772-5470-4e68-9dcb-8f4da2de95b1)
 
 --- 
-### 2. ECLO 예측 모델
+### 2. 교통사고 건당 ECLO 예측 모델
 주어진 Feature importance를 기반으로, 사고유형의 (차대차, 차대 사람)의 차이가 유의미하다는 인사이트를 얻었다. 이를 기반으로, 사고유형의 세 가지 분류인 차대차, 차대사람, 차량 단독으로 데이터셋을 3개로 나누어 예측을 진행하였다.
 
 #### 데이터 EDA(Exploratory Data Analysis)
@@ -796,7 +796,7 @@ df_grouped_2 = df_hjd_total.groupby('dong_name').agg({
 - senior_rate : 노인인구비율(합산 후 노인인구수/총인구수로 계산하여 추가)
 - raw data에서 ‘행정동’ 컬럼 값을 참조해 그 옆에 해당하는 행정동의 senior, total_population, street parking, senior_ratio 값을 추가함
 ---
-### 동별 예측 모델
+### 동별 평균 ECLO 예측 모델
 
 
 
