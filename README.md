@@ -974,14 +974,9 @@ print(feature_importances_df2.head(10))
 feature selection을 통해 차대사람 데이터셋의 성능이 소폭 향상되었다.
 ```
 
+![image](https://github.com/thdfydgh/2024_DataMining_TeamProject_1team/assets/126649413/5060a597-5bde-4c3f-b4fe-ab7a373f5eff)
 
-
-![image](https://github.com/thdfydgh/2024_DataMining_TeamProject_1team/assets/126649413/7d593484-1035-465a-8de0-695661c09fca)
-
-![image](https://github.com/thdfydgh/2024_DataMining_TeamProject_1team/assets/126649413/3eb5fae3-ee28-4046-8606-822db97a2ce4)
-
-
-
+![image](https://github.com/thdfydgh/2024_DataMining_TeamProject_1team/assets/126649413/c5c806c7-8b4f-4a7a-81c4-c4b72053bde0)
 
 
 
