@@ -2,12 +2,14 @@
 ---
 ## 활용 Data : TAAS(Traffic Accident Analysis System) 교통사고 분석 시스템 Data
 https://taas.koroad.or.kr/web/shp/sbm/initGisAnals.do?menuId=WEB_KMP_GIS_TAS 
-교통사고분석시스템에서 제공하는 서울시 지역별 Dataset을 구축하였다.
+
 ![image](https://github.com/thdfydgh/2024_DataMining_TeamProject_1team/assets/126649413/6e613ca4-6ed4-467d-9441-91bf0873628d)
+교통사고분석시스템에서 구 별 사고 data를 수집해 서울시 전체 사고 Dataset을  구축하였다.
 Data의 형태는 다음과 같다.
 ![image](https://github.com/thdfydgh/2024_DataMining_TeamProject_1team/assets/126649413/588dc067-23f7-42d1-a9ff-9a84cd77541b)
+2022년도, 2023년도 Dataset을 구축 하였으며, 2022년도 데이터로 2023년도를 예측하는 것이 큰 흐름이다.
 우리는 이 Dataset을 기반으로, Equivalent Casualty Loss Only(ECLO) 즉, 교통사고 상해정도를 예측하고 위험 요인 분석을 한다.
-ECLO = 사망자수 * 10 + 중상자수 * 5 + 경상자수 * 3 + 부상자수 * 1
+(ECLO = 사망자수 * 10 + 중상자수 * 5 + 경상자수 * 3 + 부상자수 * 1)
 <pre>
 사망자분류모델 -> feature selection -> 차대 사람 유의미 -> ECLO예측 --> 동별 상해정도 차이 유의미  -> 동별 예측 -> merge -> 동별 대책 수립(결론)
 </pre>
@@ -35,7 +37,141 @@ modeling : ECLO 예측
 
 교통사고 피해예측 EDA.ipynb : 각 feature별 ECLO값 EDA
 ---
+## 모델링
+### 사망사고 예측 모델
+사고내용
+경상사고      23723
+중상사고       6940
+부상신고사고     1862
+사망사고        180
+Name: count, dtype: int64
+서울 내 2022년도의 33699건 사고 중 사망사고의 비율은 0.5503745604647607% 이다.
 
+### 데이터 전처리
+
+# 데이터 전처리 과정
+
+1. **사망사고 라벨링**:
+   - `사고내용`이 '사망사고'인 경우를 판별하여 `사망사고여부` 컬럼을 생성하고, boolean 값으로 라벨링하였다.
+
+   ```python
+   index1 = df['사고내용'] == '사망사고'
+   df['사망사고여부'] = index1
+   ```
+
+2. **불필요한 컬럼 제거**:
+   - 분석에 불필요하거나 중복되는 정보를 담고 있는 컬럼들을 삭제하였다. 삭제된 컬럼들은 `사고번호`, `시군구`, `사망자수`, `중상자수`, `경상자수`, `부상신고자수`, `노면상태`, `가해운전자 상해정도`, `피해운전자 상해정도`, `사고내용`, `가해운전자 차종`, `피해운전자 차종`이다.
+
+   ```python
+   df.drop(['사고번호', '시군구', '사망자수', '중상자수', '경상자수', '부상신고자수', '노
+   면상태', '가해운전자 상해정도', '피해운전자 상해정도', '사고내용', '가해운전자 차종', '피해운전자 차종'], axis=1, inplace=True)
+   ```
+
+3. **사고 시간 정보 추출**:
+   - `사고일시` 컬럼에서 시간을 추출하여 `사고시각` 컬럼을 생성하였다.
+
+   ```python
+   time_lst = list(df['사고일시'])
+   hour_lst = []
+   for time in time_lst:
+       hour_lst.append((str(time)[-3:-1]))
+   df['사고시각'] = hour_lst
+   ```
+
+4. **사고일시 컬럼 삭제**:
+   - `사고일시` 컬럼을 삭제하였다.
+
+   ```python
+   df.drop(['사고일시'], axis=1, inplace=True)
+   ```
+
+5. **야간 여부 이진분류**:
+   - `사고시각`을 기준으로 22시부터 06시까지를 야간으로, 그 외 시간을 주간으로 분류하여 `야간여부` 컬럼을 생성하였다.
+
+   ```python
+   index2 = df['사고시각'] == '22', '23', '24', '1', '2', '3', '4', '5', '6'
+   df['야간여부'] = index2[0]
+   df.drop(['사고시각'], axis=1, inplace=True)
+   ```
+
+6. **주말 여부 이진분류**:
+   - `요일`을 기준으로 토요일과 일요일을 주말로, 그 외를 평일로 분류하여 `주말여부` 컬럼을 생성하였다.
+
+   ```python
+   index3 = df['요일'] == '토요일', '일요일'
+   df['주말여부'] = index3[0]
+   df.drop('요일', axis=1, inplace=True)
+   ```
+
+7. **성별 이진분류**:
+   - `가해운전자 성별`과 `피해운전자 성별`을 남성과 여성으로 구분하여 각각 `가해운전자 성별- 여성0 남성1`과 `피해운전자 성별- 여성0 남성1` 컬럼을 생성하였다.
+
+   ```python
+   index4 = df['가해운전자 성별'] == '남'
+   df['가해운전자 성별- 여성0 남성1'] = index4
+   df.drop('가해운전자 성별', axis=1, inplace=True)
+
+   index5 = df['피해운전자 성별'] == '남'
+   df['피해운전자 성별- 여성0 남성1'] = index5
+   df.drop('피해운전자 성별', axis=1, inplace=True)
+   ```
+
+8. **Boolean 값을 정수형으로 변환**:
+   - `사망사고여부`, `야간여부`, `주말여부`, `가해운전자 성별- 여성0 남성1`, `피해운전자 성별- 여성0 남성1` 컬럼의 값을 boolean에서 정수형으로 변환하였다.
+
+   ```python
+   df['야간여부'] = df['야간여부'].astype(int)
+   df['주말여부'] = df['주말여부'].astype(int)
+   df['사망사고여부'] = df['사망사고여부'].astype(int)
+   df['가해운전자 성별- 여성0 남성1'] = df['가해운전자 성별- 여성0 남성1'].astype(int)
+   df['피해운전자 성별- 여성0 남성1'] = df['피해운전자 성별- 여성0 남성1'].astype(int)
+   ```
+
+9. **연령 전처리**:
+   - `가해운전자 연령`과 `피해운전자 연령` 컬럼에서 '미분류'와 '98세 이상' 데이터를 삭제하였다.
+   - `가해운전자 연령`과 `피해운전자 연령`에서 나이 숫자만 추출하고, 이를 정수형으로 변환하였다.
+   - `가해운전자 연령`과 `피해운전자 연령` 컬럼을 정규화하여 각각 `가해운전자 연령(정규화 됨)`과 `피해운전자 연령(정규화 됨)`으로 변환하였다.
+
+   ```python
+   idx = df[df['가해운전자 연령'] == '98세 이상'].index
+   df.drop(idx, inplace=True)
+   idx = df[df['피해운전자 연령'] == '98세 이상'].index
+   df.drop(idx, inplace=True)
+
+   idx2 = df[df['가해운전자 연령'] == '미분류'].index
+   df.drop(idx2, inplace=True)
+   idx2 = df[df['피해운전자 연령'] == '미분류'].index
+   df.drop(idx2, inplace=True)
+
+   suspect_lst = list((df['가해운전자 연령']))
+   suspect_old = []
+   for old in suspect_lst:
+       suspect_old.append((old)[:-1])
+   df['가해운전자 연령'] = suspect_old
+
+   victim_lst = list(df['피해운전자 연령'])
+   victim_old = []
+   for old in victim_lst:
+       victim_old.append((old)[:-1])
+   df['피해운전자 연령'] = victim_old
+
+   df['가해운전자 연령'] = df['가해운전자 연령'].astype('int')
+   df['피해운전자 연령'] = df['피해운전자 연령'].astype('int')
+
+   olds = df[['피해운전자 연령', '가해운전자 연령']]
+   scaler = StandardScaler()
+   scaled_olds = scaler.fit_transform(olds)
+   df[['피해운전자 연령', '가해운전자 연령']] = scaled_olds
+   df.rename({'피해운전자 연령': '피해운전자 연령(정규화 됨)', '가해운전자 연령': '가해운전자 연령(정규화 됨)'}, axis=1, inplace=True)
+   ```
+
+10. **컬럼 재배치**:
+    - 종속변수인 `사망사고여부`가 데이터프레임의 마지막에 오도록 컬럼을 재배치하였다.
+
+    ```python
+    df = df.reindex(columns=['주말여부', '야간여부', '사고유형', '법규위반', '기상상태', '도로형태', '가해운전자 성별- 여성0 남성1', '가해운전자 연령(정규화 됨)', '피해운전자 성별- 여성0 남성1', '피해운전자 연령(정규화 됨)', '사망사고여부'])
+    ```
+  
 
 
 
