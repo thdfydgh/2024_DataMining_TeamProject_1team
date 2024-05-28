@@ -1011,6 +1011,9 @@ feature selection을 통해 차대사람 데이터셋의 성능이 소폭 향상
 
 #### -> 원효로2동, 둔촌동, 가리봉동 분석 필요
 
+![image](https://github.com/thdfydgh/2024_DataMining_TeamProject_1team/assets/126649413/e1ecf41f-e55b-4d44-9c84-d21b0c6ef72e)
+
+
 ### [차대사람] 사고유형(측면충돌)
 ![image](https://github.com/thdfydgh/2024_DataMining_TeamProject_1team/assets/126649413/1ffd8a95-42bf-4f46-aa78-9c857a003bb8)
 
@@ -1031,10 +1034,12 @@ feature selection을 통해 차대사람 데이터셋의 성능이 소폭 향상
 
 ![image](https://github.com/thdfydgh/2024_DataMining_TeamProject_1team/assets/126649413/00e191f7-e3e6-4731-80f1-77b0231ad14d)
 
-#### -> 삼전동, 오금동, 성수동2가, 가리봉
+#### -> 삼전동, 오금동, 성수동2가
+
+![image](https://github.com/thdfydgh/2024_DataMining_TeamProject_1team/assets/126649413/0bb615ba-604d-40fb-ab13-6f8400f9d4de)
 
 
-### 분석 결
+
 
 
 
