@@ -984,8 +984,33 @@ feature selection을 통해 차대사람 데이터셋의 성능이 소폭 향상
 
 ![image](https://github.com/thdfydgh/2024_DataMining_TeamProject_1team/assets/126649413/4a685c81-5301-4ab6-9dde-220eebc4adc4)
 
+차대차 : 도로형태/사고유형/법규위반 등이 중요 Feature로 파악
+차대사람 : 도로형태/노면주차장 면수/사고유형/고령자비율 중요 Feature로 선정
+## 결론
+사고유형 : 도로장애물, 자연재해 등이 원인, 추가적인 해결방안이 필요하지 않다고 판단.
+법규위반 : 안전 인식 향상을 위한 캠패인 등 사회적 해결방안이 필요
 
+도로형태(단일로)
+![image](https://github.com/thdfydgh/2024_DataMining_TeamProject_1team/assets/126649413/be753678-b6ca-4993-a26e-23325207d0c7)
 
+[차대차] 단일로와 평균 ECLO : 음의 관계
+-> 원효로2동, 둔촌동, 가리봉동 분석 필요
+
+[차대사람] 사고유형(측면충돌)
+![image](https://github.com/thdfydgh/2024_DataMining_TeamProject_1team/assets/126649413/1ffd8a95-42bf-4f46-aa78-9c857a003bb8)
+
+-> 원효로2동, 둔촌동, 가리봉동 분석 필요
+
+[차대차] 고령자 비율
+![image](https://github.com/thdfydgh/2024_DataMining_TeamProject_1team/assets/126649413/a713e062-90c4-4599-98d2-b8f6760d5f37)
+
+-> 가양동, 석관동, 구산동
+
+[차대차] 측면충돌
+
+![image](https://github.com/thdfydgh/2024_DataMining_TeamProject_1team/assets/126649413/00e191f7-e3e6-4731-80f1-77b0231ad14d)
+
+-> 삼전동, 오금동, 성수동2가, 가리봉
 
 
 
