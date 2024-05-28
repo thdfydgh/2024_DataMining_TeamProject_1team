@@ -40,9 +40,9 @@ modeling : ECLO 예측
 ### Main
 <pre>
 교통사고 피해예측 EDA.ipynb : 각 feature별 ECLO값 EDA
-deathnum_classfier.ipynb
-modeling.ipynb
-predict.ipynb
+deathnum_classfier.ipynb : 사망자수 이진 분류
+modeling.ipynb : 각 사고별 ECLO 예측
+predict.ipynb : 행정동별 평균 ECLO 예측측
 </pre>
 
 ## 활용 Data : TAAS(Traffic Accident Analysis System) 교통사고 분석 시스템 Data
