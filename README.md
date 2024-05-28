@@ -48,10 +48,8 @@ predict.ipynb : 행정동별 평균 ECLO 예측
 ## 활용 Data : TAAS(Traffic Accident Analysis System) 교통사고 분석 시스템 Data
 https://taas.koroad.or.kr/web/shp/sbm/initGisAnals.do?menuId=WEB_KMP_GIS_TAS 
 
-![image](https://github.com/thdfydgh/2024_DataMining_TeamProject_1team/assets/126649413/6e613ca4-6ed4-467d-9441-91bf0873628d)
 교통사고분석시스템에서 구 별 사고 data를 수집해 서울시 전체 사고 Dataset을  구축하였다.
 Data의 형태는 다음과 같다.
-![image](https://github.com/thdfydgh/2024_DataMining_TeamProject_1team/assets/126649413/588dc067-23f7-42d1-a9ff-9a84cd77541b)
 2022년도, 2023년도 Dataset을 구축 하였으며, 2022년도 데이터로 2023년도를 예측하는 것이 큰 흐름이다.
 우리는 이 Dataset을 기반으로, Equivalent Casualty Loss Only(ECLO) 즉, 교통사고 상해정도를 예측하고 위험 요인 분석을 한다.
 (ECLO = 사망자수 * 10 + 중상자수 * 5 + 경상자수 * 3 + 부상자수 * 1)
