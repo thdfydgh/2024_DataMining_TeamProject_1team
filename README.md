@@ -794,7 +794,7 @@ df_grouped_2 = df_hjd_total.groupby('dong_name').agg({
 - 변환 뒤 데이터
 ![Untitled 6](https://github.com/thdfydgh/2024_DataMining_TeamProject_1team/assets/161555261/5198034d-f0b5-4d0e-9c35-1b3173335a16)
 - senior_rate : 노인인구비율(합산 후 노인인구수/총인구수로 계산하여 추가)
-- raw data에서 ‘행정동’ 컬럼 값을 참조해 그 옆에 해당하는 행정동의 senior, total_population, street parking, senior_ratio 값을 추가함
+- raw data에서 ‘행정동’ 컬럼 값을 참조해 그 옆에 해당하는 행정동의 total_population, street parking, senior_ratio 값을 추가함
 ---
 ### 동별 평균 ECLO 예측 모델
 
