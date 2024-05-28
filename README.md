@@ -1,5 +1,8 @@
 # 서울시 교통사고 상해예측 & 위험요인 분석
 
+![image](https://github.com/thdfydgh/2024_DataMining_TeamProject_1team/assets/126649413/91664e3d-1337-4cd4-bf19-d2613142d93a)
+
+
 <pre>
   
   운전자들의 안전에 관한 인식 향상을 통해 전체적인 교통사고량은 감소하고 있지만,
