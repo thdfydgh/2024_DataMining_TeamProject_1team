@@ -1019,7 +1019,13 @@ feature selection을 통해 차대사람 데이터셋의 성능이 소폭 향상
 ### [차대차] 고령자 비율
 ![image](https://github.com/thdfydgh/2024_DataMining_TeamProject_1team/assets/126649413/a713e062-90c4-4599-98d2-b8f6760d5f37)
 
-#### -> 가양동, 석관동, 구산동
+#### ->  구산동, 석관동, 가양동
+
+![image](https://github.com/thdfydgh/2024_DataMining_TeamProject_1team/assets/126649413/b79772bc-20f7-4f37-bbed-6468c33e3104)
+
+
+
+
 
 ### [차대차] 측면충돌
 
@@ -1028,6 +1034,7 @@ feature selection을 통해 차대사람 데이터셋의 성능이 소폭 향상
 #### -> 삼전동, 오금동, 성수동2가, 가리봉
 
 
+### 분석 결
 
 
 
